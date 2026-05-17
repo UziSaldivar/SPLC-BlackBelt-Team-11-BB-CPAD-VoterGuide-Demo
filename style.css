@@ -425,7 +425,7 @@ body {
 /* Landscape phones: constrain by height */
 @media (max-height: 500px) and (orientation: landscape) {
   :root {
-    --drawer-height: 30vh;
+    --drawer-height: 50vh;
   }
 
   #source-drawer::before {
