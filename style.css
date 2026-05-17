@@ -31,7 +31,7 @@
   --color-text-muted: #ffffff;
   --color-border: rgba(200, 169, 110, 0.2);
 
-  --drawer-height: 35vh;
+  --drawer-height: 55vh;
   --drawer-radius: 40px;
 
   --transition-speed: 200ms;
@@ -425,7 +425,7 @@ body {
 /* Landscape phones: constrain by height */
 @media (max-height: 500px) and (orientation: landscape) {
   :root {
-    --drawer-height: 80vh;
+    --drawer-height: 30vh;
   }
 
   #source-drawer::before {
