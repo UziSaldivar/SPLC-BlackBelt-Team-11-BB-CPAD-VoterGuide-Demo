@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+
+  <!--
+    VIEWPORT: width=device-width prevents zoom.
+    user-scalable=no gives a true app-like feel (no pinch-zoom).
+    Remove user-scalable=no if you want users to be able to zoom.
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+
+  <!-- App metadata -->
+  <meta name="description" content="Alabama Civic & Voting Guide — interactive community education resource." />
+  <meta name="theme-color" content="#0e0f14" />
+
+  <!-- iOS: Add to Home Screen behavior -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AL Civic Guide" />
+
+  <!-- Android PWA -->
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Open Graph (QR code sharing previews) -->
+  <meta property="og:title" content="Alabama Civic & Voting Guide" />
+  <meta property="og:description" content="Easy-to-understand civic and voting information for Alabama communities." />
+  <meta property="og:type" content="website" />
+
+  <title>Alabama Civic Guide</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- =====================================================================
+       LOADING SCREEN
+       Shown while the first slide image loads.
+       ===================================================================== -->
+  <div id="loading-screen" role="status" aria-label="Loading">
+    <p class="loading-logo">Alabama Civic Guide</p>
+    <div class="loading-spinner" aria-hidden="true"></div>
+  </div>
+
+
+  <!-- =====================================================================
+       MAIN APP
+       ===================================================================== -->
+  <main id="app">
+
+    <!-- -----------------------------------------------------------------
+         SLIDE CONTAINER
+         Maintains 16:9 aspect ratio. All overlays are positioned inside.
+         ----------------------------------------------------------------- -->
+    <div id="slide-container">
+
+      <!-- The slide image — src is swapped by app.js on navigation -->
+      <img
+        id="slide-image"
+        src=""
+        alt="Loading slide..."
+        draggable="false"
+      />
+
+      <!-- Invisible button + GIF overlay layer — rebuilt by app.js each slide -->
+      <div id="overlay-layer" aria-hidden="false"></div>
+
+    </div>
+
+  </main>
+
+
+  <!-- =====================================================================
+       SOURCE DRAWER BACKDROP (Plan A)
+       Darkens the slide when the drawer is open.
+       Clicking it closes the drawer.
+       ===================================================================== -->
+  <div id="drawer-backdrop" aria-hidden="true"></div>
+
+
+  <!-- =====================================================================
+       SOURCE DRAWER (Plan A — Bottom Sheet)
+       Slides up from the bottom when a Source button is pressed.
+       Plan B (new tab) is configured in slides.js — no HTML needed.
+       ===================================================================== -->
+  <aside
+    id="source-drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="drawer-title"
+    aria-describedby="drawer-description"
+  >
+
+    <div class="drawer-header">
+      <h2 id="drawer-title">Source</h2>
+      <button id="drawer-close-btn" aria-label="Close source panel">✕</button>
+    </div>
+
+    <p id="drawer-description">Visit the source website for more information.</p>
+
+    <div class="drawer-actions">
+      <a
+        id="drawer-visit-btn"
+        href="#"
+        target="_blank"
+        rel="noopener noreferrer"
+      >Visit Source</a>
+      <button class="drawer-cancel-btn" onclick="closeSourceDrawer()">Cancel</button>
+    </div>
+
+  </aside>
+
+
+  <!-- =====================================================================
+       SCRIPTS
+       Load config first, then app logic.
+       ===================================================================== -->
+  <script src="config/slides.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>

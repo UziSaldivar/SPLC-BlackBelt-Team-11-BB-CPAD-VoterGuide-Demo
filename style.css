@@ -1,0 +1,462 @@
+/* =============================================================================
+   STYLE.CSS — Civic Slides Application
+   =============================================================================
+   Mobile-first, app-like slide viewer.
+   Aspect ratio: 16:9 (1920x1080 Canva export)
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   FONTS
+   --------------------------------------------------------------------------- */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@700&display=swap");
+
+/* ---------------------------------------------------------------------------
+   RESET & ROOT VARIABLES
+   --------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent; /* Remove tap flash on mobile */
+}
+
+:root {
+  --color-bg: #1c3a73;
+  --color-surface: #1c3a73;
+  --color-accent: #ffffff;       /* Civic gold */
+  --color-accent-dark: #a8893e;
+  --color-text: #f0ede6;
+  --color-text-muted: #ffffff;
+  --color-border: rgba(200, 169, 110, 0.2);
+
+  --drawer-height: 55vh;
+  --drawer-radius: 20px;
+
+  --transition-speed: 200ms;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;              /* No scrolling — full app experience */
+  background: var(--color-bg);
+  font-family: var(--font-body);
+  color: var(--color-text);
+  /* Prevent pull-to-refresh on mobile */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
+/* ---------------------------------------------------------------------------
+   LOADING SCREEN
+   --------------------------------------------------------------------------- */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  gap: 24px;
+  transition: opacity 0.4s ease;
+}
+
+#loading-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-logo {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  color: var(--color-accent);
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------------------------------------------------------------------------
+   APP SHELL — fills viewport
+   --------------------------------------------------------------------------- */
+#app {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+
+  height: 100dvh;
+}
+
+/* ---------------------------------------------------------------------------
+   SLIDE CONTAINER — maintains 16:9 aspect ratio
+   --------------------------------------------------------------------------- */
+#slide-container {
+  width: 100%;
+  max-height: 100dvh;
+  max-width: calc(100dvh * (16 / 9));
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Fade transition */
+#slide-container.transitioning {
+  opacity: 0;
+  transition: opacity var(--transition-speed) ease;
+}
+
+/* Slide-in/out transitions */
+#slide-container.slide-out {
+  transform: translateX(-30px);
+  opacity: 0;
+  transition: transform var(--transition-speed) ease, opacity var(--transition-speed) ease;
+}
+
+#slide-container.slide-in {
+  animation: slideIn 250ms ease forwards;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(30px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+   SLIDE IMAGE
+   --------------------------------------------------------------------------- */
+#slide-image {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------------------
+   OVERLAY LAYER — sits on top of the slide image
+   --------------------------------------------------------------------------- */
+#overlay-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;         /* Layer itself is passthrough */
+}
+
+/* ---------------------------------------------------------------------------
+   INVISIBLE OVERLAY BUTTONS
+   --------------------------------------------------------------------------- */
+.overlay-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  pointer-events: all;          /* Buttons intercept clicks */
+  padding: 0;
+  border-radius: 4px;
+
+  /* Subtle press animation for touch feedback */
+  transition: background-color 0.1s ease, transform 0.1s ease;
+}
+
+.overlay-btn:active {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(0.98);
+}
+
+/* Focus ring for keyboard accessibility */
+.overlay-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* DEBUG MODE: shows button boundaries so you can position them */
+.overlay-btn.debug {
+  background: rgba(200, 169, 110, 0.25) !important;
+  border: 2px dashed var(--color-accent) !important;
+}
+
+.overlay-btn.debug::after {
+  content: attr(data-id);
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  color: var(--color-accent);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   GIF / MEDIA OVERLAYS
+   --------------------------------------------------------------------------- */
+.gif-overlay {
+  position: absolute;
+  height: auto;                 /* Maintain aspect ratio */
+  pointer-events: none;
+  z-index: 1;                   /* Above slide, below buttons */
+}
+
+/* ---------------------------------------------------------------------------
+   SOURCE DRAWER BACKDROP
+   --------------------------------------------------------------------------- */
+#drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#drawer-backdrop.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ---------------------------------------------------------------------------
+   SOURCE DRAWER — Plan A: Bottom Sheet
+   --------------------------------------------------------------------------- */
+#source-drawer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 300;
+
+  height: var(--drawer-height);
+  max-width: 900px;
+  margin: 0 auto;
+
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  border-radius: var(--drawer-radius) var(--drawer-radius) 0 0;
+
+  display: flex;
+  flex-direction: column;
+  padding: 0 28px 32px;
+
+  /* Hidden state: translated off-screen */
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Subtle inner glow */
+  box-shadow:
+    0 -4px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(200, 169, 110, 0.15);
+}
+
+#source-drawer.open {
+  transform: translateY(0);
+}
+
+/* Drag handle indicator */
+#source-drawer::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+  margin: 16px auto 24px;
+  flex-shrink: 0;
+}
+
+.drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+#drawer-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+  color: var(--color-accent);
+  line-height: 1.2;
+  flex: 1;
+}
+
+#drawer-close-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  transition: border-color 0.2s, color 0.2s;
+  line-height: 1;
+}
+
+#drawer-close-btn:hover,
+#drawer-close-btn:focus-visible {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+  outline: none;
+}
+
+#drawer-description {
+  white-space: pre-line;
+  font-size: clamp(2rem, 2.5vw, 0.95rem);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.drawer-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-shrink: 0;
+}
+
+#drawer-visit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: var(--color-accent);
+  color: #000000;
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 2rem);
+  flex: 1;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  target: _blank;
+}
+
+#drawer-visit-btn:hover {
+  background: var(--color-accent-dark);
+}
+
+#drawer-visit-btn:active {
+  transform: scale(0.98);
+}
+
+/* External link icon */
+#drawer-visit-btn::after {
+  content: "↗";
+  font-size: 1em;
+}
+
+.drawer-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 20px;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: clamp(2rem, 2.5vw, 1.1rem);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.drawer-cancel-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+/* ---------------------------------------------------------------------------
+   RESPONSIVE ADJUSTMENTS
+   --------------------------------------------------------------------------- */
+
+/* Portrait phones: full-width slide, letterboxed by aspect ratio */
+@media (max-width: 600px) {
+  :root {
+    --drawer-height: 60vh;
+  }
+
+  #source-drawer {
+    padding: 0 20px 24px;
+  }
+
+  #drawer-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* Landscape phones: constrain by height */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root {
+    --drawer-height: 80vh;
+  }
+
+  #source-drawer::before {
+    margin-bottom: 12px;
+  }
+}
+
+/* Large screens: cap width so slides don't stretch */
+@media (min-width: 1400px) {
+  #slide-container {
+    max-width: 1200px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   SAFE AREA INSETS (iPhone notch / Dynamic Island support)
+   --------------------------------------------------------------------------- */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  #source-drawer {
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   UTILITY
+   --------------------------------------------------------------------------- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
