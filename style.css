@@ -356,7 +356,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 24px;
+  padding: 10px 20px;
   background: var(--color-accent);
   color: #000000;
   border-radius: 10px;
@@ -387,7 +387,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 20px;
+  padding: 10px 16px;
   background: transparent;
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
@@ -410,27 +410,65 @@ body {
 /* Portrait phones: full-width slide, letterboxed by aspect ratio */
 @media (max-width: 600px) {
   :root {
-    --drawer-height: 60vh;
+    --drawer-height: 90vh;
   }
 
   #source-drawer {
-    padding: 0 20px 24px;
+    padding: 0 20px 16px;
+  }
+  #source-drawer::before {
+    margin: 10px auto 14px;   /* shrink the drag handle gap */
   }
 
   #drawer-title {
     font-size: 1.1rem;
   }
+
+  .drawer-header {
+    margin-bottom: 8px;
+  }
+.drawer-actions {
+    margin-top: 12px; 
+  }
 }
+
 
 /* Landscape phones: constrain by height */
 @media (max-height: 500px) and (orientation: landscape) {
   :root {
-    --drawer-height: 50vh;
+    --drawer-height: 80vh;
   }
 
   #source-drawer::before {
-    margin-bottom: 12px;
+    margin: 10px auto 14px;   /* shrink the drag handle gap */
   }
+   #drawer-title {
+    font-size: 1.1rem;
+  }
+  
+  .drawer-header {
+    margin-bottom: 8px;
+  }
+
+  .drawer-actions {
+    margin-top: 12px; 
+  }
+
+    #drawer-description {
+    font-size: 1rem;
+  }
+
+  #drawer-visit-btn {
+    font-size: 1rem;
+    padding: 8px 16px;
+  }
+
+  .drawer-cancel-btn {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+
+
 }
 
 /* Large screens: cap width so slides don't stretch */
